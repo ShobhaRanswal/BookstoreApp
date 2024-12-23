@@ -2,14 +2,18 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import Login from './Login.jsx';
+import {useAuth} from "../context/AuthProvider"
+import Logout from './Logout.jsx';
 function  Navbar() {
-  const [theme,setTheme] = useState(localStorage.getItem("theme")?localStorage.getItem("theme"):"light")
+  const [authUser,setAuthUser]= useAuth();
+  console.log(authUser);
+  const [theme,setTheme] = useState(localStorage.getItem("theme")?localStorage.getItem("theme"):"light");
   const element = document.documentElement;
   useEffect(()=>{
     if(theme==="dark")
     {
       element.classList.add("dark");
-      localStorage.setItem("theme","dark")
+      localStorage.setItem("theme","dark");
       document.body.classList.add("dark");
     }else
     {
@@ -18,23 +22,26 @@ function  Navbar() {
       document.body.classList.remove("dark");
     }
 
-  },[theme])
-  const [sticky,setSticky] = useState(false)
+  },[theme]);
+  const [sticky,setSticky] = useState(false);
 
   useEffect(()=> 
   {
-    const handleScroll=()=>{
-      if(window.scrollY>0)
+    const handleScroll = () => {
+      if(window.scrollY > 0)
       {
-        setSticky(true)
+        setSticky(true);
       }
       else
       {
-        setSticky(false)
+        setSticky(false);
       }
     }
-    window.addEventListener('scroll',handleScroll)
-  },[])
+    window.addEventListener('scroll',handleScroll);
+    return () =>{
+      window.removeEventListener("scroll",handleScroll);
+    };
+  },[]);
   const navItems =(
     <>
      <li><a href="/">Home</a></li>
@@ -44,8 +51,9 @@ function  Navbar() {
     </>
   );
   return (
-    <div className={`max-w-screen-2xl container mx-auto md:px-20 px-4 dark:bg-slate-900 dark:text-white  fixed top-0 right-0 left-0 z-50 ${
-      sticky?"sticky-navbar shadow-md bg-base-200 dark:bg-slate-600 dark:text-white  duration-300 transition-all ease-in-out" :" "
+    <div className={` max-w-screen-2xl container mx-auto md:px-20 px-4 dark:bg-slate-800 dark:text-white  fixed top-0 right-0 left-0 z-50 ${
+      sticky
+      ?"sticky-navbar shadow-md bg-base-200 dark:bg-slate-600 dark:text-white  duration-300 transition-all ease-in-out" :""
     }`}> 
       <div className="navbar ">
   <div className="navbar-start">
@@ -118,19 +126,24 @@ function  Navbar() {
     className="swap-on h-8 w-10 fill-current"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    onClick={()=>setTheme(theme==="dark"?"light":"dark")}
+    onClick={()=>setTheme(theme==="light"?"dark":"light")}
     >
 
     <path
       d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
   </svg>
 </label>
+{
+  authUser?(<Logout/>)
+  :(
   <div className="">
-    <a className="bg-black text-white px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer" onClick={()=>document.getElementById("my_modal_3").showModal()}>
+    <a className="bg-black text-white px-3 py-2 rounded-md hover:bg-slate-800 duration-300 cursor-pointer dark:bg-slate-900 dark:text-white" onClick={()=>document.getElementById("my_modal_3").showModal()}>
       Login</a>
       <Login/>
 
   </div>
+)}
+  
 </div>
 
 </div>
